@@ -40,7 +40,7 @@ export const useSettingStore = defineStore('setting', {
 
       return lang;
     },
-    isChinaMainland: (state): boolean => {
+    isCHS: (state): boolean => {
       let lang = state.lang;
 
       if (lang === 'system') {

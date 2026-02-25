@@ -106,7 +106,7 @@ const active = ref({
 });
 
 const navList = computed(() => config.value.list.map((t) => ({ id: t.id, name: t.name })));
-const platform = computed(() => (storeSetting.isChinaMainland ? CN_PLATFORM : OTHER_PLATFORM));
+const platform = computed(() => (storeSetting.isCHS ? CN_PLATFORM : OTHER_PLATFORM));
 
 onMounted(() => {
   getSetting();
