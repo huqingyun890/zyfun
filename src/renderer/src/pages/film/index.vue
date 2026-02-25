@@ -46,12 +46,25 @@
 
       <div v-if="folderBreadcrumb.length">
         <t-breadcrumb
-          :max-items="8"
-          :items-before-collapse="2"
+          :max-items="9"
+          :items-before-collapse="3"
           :items-after-collapse="3"
           max-item-width="140"
           class="breadcrumb"
         >
+          <t-breadcrumb-item>
+            <t-button
+              variant="text"
+              size="small"
+              shape="square"
+              class="breadcrumb-home-btn"
+              @click="handleFolderBreadcrumbClick({ label: 'home', value: null })"
+            >
+              <template #icon>
+                <home-icon />
+              </template>
+            </t-button>
+          </t-breadcrumb-item>
           <t-breadcrumb-item
             v-for="item in folderBreadcrumb"
             :key="item.value"
@@ -62,7 +75,9 @@
           <template #ellipsis="{ items }">
             <t-dropdown>
               <t-button variant="text" size="small" shape="square">
-                <ellipsis-icon stroke-color="var(--td-text-color-placeholder)" />
+                <template #icon>
+                  <ellipsis-icon stroke-color="var(--td-text-color-placeholder)" />
+                </template>
               </t-button>
               <t-dropdown-menu>
                 <t-dropdown-item
@@ -153,7 +168,7 @@ import { isArray, isArrayEmpty, isObject, isObjectEmpty } from '@shared/modules/
 import type { ICmsHome, ICmsInfo } from '@shared/types/cms';
 import type { IModels } from '@shared/types/db';
 import { differenceBy } from 'es-toolkit';
-import { EllipsisIcon, RootListIcon } from 'tdesign-icons-vue-next';
+import { EllipsisIcon, HomeIcon, RootListIcon } from 'tdesign-icons-vue-next';
 import type { PopupVisibleChangeContext } from 'tdesign-vue-next';
 import { MessagePlugin } from 'tdesign-vue-next';
 import InfiniteLoading from 'v3-infinite-loading';
@@ -649,12 +664,12 @@ const onNavChange = async (id: string) => {
   }
 };
 
-const handleFolderBreadcrumbClick = (item: { label: ICmsInfo['vod_name']; value: ICmsInfo['vod_id'] }) => {
+const handleFolderBreadcrumbClick = (item: { label: ICmsInfo['vod_name']; value: ICmsInfo['vod_id'] | null }) => {
   resetPagination();
 
   const index = folderBreadcrumb.value.findIndex((i) => i.value === item.value);
-  folderBreadcrumb.value = folderBreadcrumb.value.slice(0, index + 1);
-  active.value.folder = item.value;
+  folderBreadcrumb.value = index > -1 ? folderBreadcrumb.value.slice(0, index + 1) : [];
+  active.value.folder = index > -1 ? item.value! : '';
 
   filmList.value = [];
 
@@ -715,6 +730,22 @@ const handleFolderBreadcrumbClick = (item: { label: ICmsInfo['vod_name']; value:
       padding: 0 0 0 var(--td-comp-paddingLR-s);
       border-radius: var(--td-radius-medium);
       background-color: var(--td-bg-color-component);
+
+      &-home-btn {
+        border-color: transparent;
+
+        .t-icon {
+          color: var(--td-text-color-placeholder);
+        }
+
+        &:hover {
+          background-color: transparent;
+
+          .t-icon {
+            color: var(--td-text-color-primary);
+          }
+        }
+      }
 
       :deep(.t-breadcrumb__item) {
         .t-breadcrumb--text-overflow .t-breadcrumb__inner:hover {
