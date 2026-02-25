@@ -8,6 +8,7 @@
 - 优化: 简化hash路由加载
 - 修复: 缩放 尺寸计算错误; 刷新丢失缩放比例; 数值组件改为滑块; mac系统缩放不同步; 比例最大值和最小值
 - 修复: common-nav组件 像素计算错误; 重复滚动; 点击部分dom再点击第一个将滚动至最后; 切换页面(或搜索结果点击)搜索列表丢失; 搜索结果清空不触发滚动
+- 修复: 部分机器判断electron环境报错
 - 变动: 依赖库升级
 
 [View on GitHub](https://github.com/Hiram-Wong/ZyPlayer/releases/tag/v3.4.3)
