@@ -4,11 +4,11 @@ import process from 'node:process';
 
 import { headersPascalCase } from '@shared/modules/headers';
 import { toString } from '@shared/modules/toString';
+import { isJsonStr } from '@shared/modules/validate';
 import fs from 'fs-extra';
 import JSON5 from 'json5';
 import mime from 'mime-types';
 import protobuf from 'protobufjs';
-import qs from 'qs';
 import type { Options } from 'sync-request';
 import syncRequest, { FormData } from 'sync-request';
 
@@ -99,11 +99,10 @@ const fetch = (url: string, options: RequestOptions = {}) => {
 
     if (method !== 'GET') {
       if (contentType.includes('application/x-www-form-urlencoded')) {
-        const body = qs.parse(options.body as string);
+        const rawBody = isJsonStr(options.body) ? JSON5.parse(options.body as string) : options.body;
+        const body = Object.fromEntries(new URLSearchParams(rawBody));
         const fd = new FormData();
-        Object.entries(body).forEach(([key, value]) => {
-          fd.append(key, value as string);
-        });
+        Object.entries(body).forEach(([key, value]) => fd.append(key, value as string));
         config.form = fd;
       } else if (['text/plain', 'text/html', 'text/xml'].includes(contentType)) {
         config.body = options.body;
@@ -149,7 +148,7 @@ const fetch = (url: string, options: RequestOptions = {}) => {
         }
         config.body = raw;
       } else {
-        const body = qs.parse(options.body as string);
+        const body = isJsonStr(options.body) ? JSON5.parse(options.body as string) : options.body;
         config.json = body;
       }
     }

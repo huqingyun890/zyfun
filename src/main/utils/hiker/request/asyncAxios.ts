@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { headersPascalCase } from '@shared/modules/headers';
 import { toString } from '@shared/modules/toString';
+import { isJsonStr } from '@shared/modules/validate';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import FormData from 'form-data';
@@ -10,7 +11,6 @@ import fs from 'fs-extra';
 import JSON5 from 'json5';
 import mime from 'mime-types';
 import protobuf from 'protobufjs';
-import qs from 'qs';
 
 import { MOBILE_UA, PC_UA } from '../ua';
 
@@ -80,7 +80,7 @@ const fetch = async (url: string, options: RequestOptions = {}) => {
 
     if (method !== 'GET') {
       if (contentType.includes('application/x-www-form-urlencoded')) {
-        const body = qs.stringify(qs.parse(options.body));
+        const body = isJsonStr(options.body) ? JSON5.parse(options.body) : options.body;
         config.data = body;
       } else if (['text/plain', 'text/html', 'text/xml'].some((t) => contentType.includes(t))) {
         config.data = options.body;
@@ -128,8 +128,9 @@ const fetch = async (url: string, options: RequestOptions = {}) => {
         config.data = raw;
       } else {
         if (!contentType) config.headers!['Content-Type'] = 'application/json';
-        const body = qs.parse(options.body);
-        config.data = JSON.stringify(body);
+
+        const body = isJsonStr(options.body) ? JSON5.parse(options.body) : options.body;
+        config.data = body;
       }
     }
 

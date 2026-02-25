@@ -4,12 +4,12 @@ import process from 'node:process';
 
 import { headersPascalCase } from '@shared/modules/headers';
 import { toString } from '@shared/modules/toString';
+import { isJsonStr } from '@shared/modules/validate';
 import FormData from 'form-data';
 import fs from 'fs-extra';
 import JSON5 from 'json5';
 import mime from 'mime-types';
 import protobuf from 'protobufjs';
-import qs from 'qs';
 import syncFetch from 'sync-fetch';
 
 import { MOBILE_UA, PC_UA } from '../ua';
@@ -86,8 +86,9 @@ const fetch = (url: string, options: RequestOptions = {}) => {
 
     if (method !== 'GET') {
       if (contentType.includes('application/x-www-form-urlencoded')) {
-        const body = qs.parse(options.body as string) as Record<string, string>;
-        config.body = new URLSearchParams(body).toString();
+        const rawBody = isJsonStr(options.body) ? JSON5.parse(options.body as string) : options.body;
+        const body = new URLSearchParams(rawBody).toString();
+        config.body = body;
       } else if (['text/plain', 'text/html', 'text/xml'].includes(contentType)) {
         config.body = options.body;
       } else if (contentType.includes('multipart/form-data')) {
@@ -133,8 +134,10 @@ const fetch = (url: string, options: RequestOptions = {}) => {
         config.body = raw;
       } else {
         if (!contentType) config.headers!['Content-Type'] = 'application/json';
-        const body = qs.parse(options.body as string);
-        config.body = JSON.stringify(body);
+
+        const rawBody = isJsonStr(options.body) ? JSON5.parse(options.body as string) : options.body;
+        const body = JSON.stringify(rawBody);
+        config.body = body;
       }
     }
 
