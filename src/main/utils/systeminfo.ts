@@ -8,20 +8,20 @@ import macosRelease from 'macos-release';
 import windowsRelease from 'windows-release';
 
 export const platform: IPlatform = (() => {
-  const plat = process.platform as NodeJS.Platform | 'ohos';
+  const plat = process.platform as NodeJS.Platform | 'ohos' | 'openharmony' | 'harmonyos';
   if (plat === 'win32') return 'win32';
   if (plat === 'darwin') return 'darwin';
   if (plat === 'linux') return 'linux';
-  if (plat === 'ohos') return 'ohos';
+  if (plat === 'ohos' || plat === 'openharmony' || plat === 'harmonyos') return 'ohos';
   return 'unknown';
 })();
 
 export const release: string = (() => {
-  const plat = process.platform as NodeJS.Platform | 'ohos';
+  const plat = process.platform as NodeJS.Platform | 'ohos' | 'openharmony' | 'harmonyos';
   if (plat === 'win32') return windowsRelease() || 'unknown';
   if (plat === 'darwin') return macosRelease().version;
   if (plat === 'linux') return os.release();
-  if (plat === 'ohos') return os.release();
+  if (plat === 'ohos' || plat === 'openharmony' || plat === 'harmonyos') return os.release();
   return 'unknown';
 })();
 
